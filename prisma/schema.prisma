@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  username      String   @unique
+  email         String   @unique
+  password      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  isApproved    Boolean  @default(false)
+  paymentStatus String   @default("pending")
+  paymentNote   String?
+
+  botConfig     BotConfig?
+}
+
+model BotConfig {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // WhatsApp
+  waPhoneNumberId   String?
+  waAccessToken     String?
+  waVerifyToken     String?
+  waNumber          String?
+  waActive          Boolean  @default(false)
+
+  // Facebook Messenger
+  fbPageId          String?
+  fbAccessToken     String?
+  fbVerifyToken     String?
+  fbActive          Boolean  @default(false)
+
+  // Instagram
+  igAccountId       String?
+  igAccessToken     String?
+  igActive          Boolean  @default(false)
+
+  isActive          Boolean  @default(false)
+  welcomeMessage    String?  @db.Text
+  aiEnabled         Boolean  @default(false)
+  businessContext   String?  @db.Text
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Admin {
+  id       String @id @default(cuid())
+  email    String @unique
+  password String
+}
